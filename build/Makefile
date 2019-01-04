@@ -24,8 +24,7 @@ x86_64:
 	install -m755 ${ISOLINUX}/libcom32.c32 ./x86_64/isolinux/libcom32.c32
 	install -m755 ${ISOLINUX}/libutil.c32 ./x86_64/isolinux/libutil.c32
 	install -m755 ${ISOLINUX}/vesamenu.c32 ./x86_64/isolinux/vesamenu.c32
-	convert ./CoreOS.svg ./x86_64/isolinux/splash.png
 	install /boot/vmlinuz-${KVER} ./x86_64/isolinux/vmlinuz
 	mkisofs -o ./x86_64/coreos.iso -b isolinux.bin -c boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -R -J -v x86_64/isolinux/
 
-.PHONY: x86_64	
+.PHONY: x86_64

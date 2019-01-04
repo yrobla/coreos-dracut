@@ -1,7 +1,8 @@
 [Unit]
 Description=CoreOs Installer
 After=dracut-initqueue.service
-#After=getty@tty2.service
+Wants=network-online.target network.target NetworkManager-wait-online.service
+After=network-online.target network.target NetworkManager-wait-online.service
 
 [Service]
 Type=oneshot
