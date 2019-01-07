@@ -4,7 +4,52 @@ Download latest RHCOS image from [https://releases-redhat-coreos.cloud.paas.upsh
 
 Uncompress it: gunzip redhat-coreos-maipo-47.206-qemu.qcow2.gz
 
-You need to be inside a vm running that image. So you need to create a vm with that qcow2 base image, and inject ssh keys using an ignition file. Once you have the VM up and running, you need to ssh into it:
+You need to be inside a vm running that image. So you need to create a vm with that qcow2 base image, and inject ssh keys using an ignition file.
+
+The ignition file would look something like this:
+
+    {  
+       "ignition":{  
+          "config":{  
+          },
+          "security":{  
+             "tls":{  
+                "certificateAuthorities":[  
+                   {  
+                      "source":"<some source hash>",
+                      "verification":{  
+                      }
+                   }
+                ]
+             }
+          },
+          "timeouts":{  
+          },
+          "version":"2.2.0"
+       },
+       ...
+       "passwd":{  
+          "users":[  
+             {  
+                "name":"core",
+                "sshAuthorizedKeys":[  
+                   "<public key>"
+                ]
+             }
+          ]
+       },
+       ...
+    }
+
+
+Add something like this to your libvirt domain XML:
+
+    <qemu:commandline>
+    <qemu:arg value='-fw_cfg'/>
+    <qemu:arg value='name=opt/com.coreos/config,file=<path_to_ign_file>'/>
+    </qemu:commandline>
+
+Once you have the VM up and running, you need to ssh into it:
 
     ssh core@<ip_of_vm>
 
