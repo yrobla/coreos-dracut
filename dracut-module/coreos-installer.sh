@@ -1,27 +1,17 @@
-#!/bin/sh
-
-
-chvt 2
-
-############################################################
-# Helper to write the ignition config
-############################################################
-function write_ignition() if [[ -f /tmp/ignition.cfg ]]; then
-    # The OEM partition should be #6 but make no assumptions here!
-    # Also don't mount by label directly in case other devices conflict.
-    dialog --title 'CoreOS Installer' --infobox "Installing ignition config" 5 70
-    local OEM_DEV=$(blkid -t "LABEL=OEM" -o device "${DEST_DEV}"*)
-
-    mkdir -p /mnt/oemfs
-    mount "${OEM_DEV}" /mnt/oemfs
-    trap 'umount /mnt/oemfs' RETURN
-
-    cp /tmp/ignition.cfg /mnt/oemfs/config.ign
-    sleep 1
-fi
-
+#!/bin/bash
 
 chvt 2
+
+udevadm trigger
+udevadm settle
+
+# iterate over all interfaces and set them up
+readarray -t interfaces < <(ip l | awk -F ":" '/^[0-9]+:/{dev=$2 ; if ( dev !~ /^ lo$/) {print $2}}')
+for iface in "${interfaces[@]// /}"
+do
+    /sbin/ifup $iface
+done
+
 
 ############################################################
 #Get the image url to install
@@ -33,7 +23,7 @@ do
 	if [ ! -f /tmp/image_url ]
 	then
 		dialog --title 'CoreOS Installer' --inputbox "Enter the CoreOS Image URL
-        to install" 5 75 "https://192.168.126.1/images/rhcos-qemu.raw" 2>/tmp/image_url
+        to install" 5 75 "http://10.8.125.26/images/rhcos-qemu.raw" 2>/tmp/image_url
 	fi
 
 	IMAGE_URL=$(cat /tmp/image_url)
@@ -194,4 +184,3 @@ then
 	sleep 5
 	reboot
 fi
-

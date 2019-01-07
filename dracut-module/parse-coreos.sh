@@ -30,14 +30,16 @@ then
 	echo 1 > /tmp/skip_media_check
 fi
 
-if getargbool 0 coreos.skip_reboot 
+if getargbool 0 coreos.skip_reboot
 then
 	echo "Asserting reboot skip" >> /tmp/debug
 	echo 1 > /tmp/skip_reboot
 fi
+
 
 # Suppress initrd-switch-root.service from starting
 rm -f /etc/initrd-release
 
 # Suppress most console messages for the installer to run without interference
 dmesg -n 1
+

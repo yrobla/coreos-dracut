@@ -1,8 +1,7 @@
 [Unit]
 Description=CoreOs Installer
-After=dracut-initqueue.service
-Wants=network-online.target network.target NetworkManager-wait-online.service
-After=network-online.target network.target NetworkManager-wait-online.service
+Requires=network-online.target
+After=network-online.target
 
 [Service]
 Type=oneshot
