@@ -30,3 +30,5 @@ corresponding options are specified on the kernel command line
 * coreos.image_url - The url of the coreos image to install to this device
 * coreos.ignition_url - The url of the coreos ignition config (optional, enter
   coreos.ignition_url=skip to not load an ignition config)
+
+For detailed documentation, please visit the ``docs`` folder.
