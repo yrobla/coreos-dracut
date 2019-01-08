@@ -17,7 +17,7 @@ This will take you to a container where you can install the needed dependencies,
 
     yum -y install git
     cd /tmp
-    git clone [https://github.com/yrobla/coreos-dracut.git](https://github.com/yrobla/coreos-dracut.git)
+    git clone https://github.com/yrobla/coreos-dracut.git
     cp -R /tmp/coreos-dracut /media/root/tmp/
     exit
 
@@ -55,7 +55,7 @@ To generate the image, we need to have the vmlinuz of the ostree in the right /b
 Before executing mkisofs we need to download some specific dependencies. So execute the following commands:
 
     cd /tmp/
-    curl [https://rpmfind.net/linux/fedora/linux/releases/27/Everything/x86_64/os/Packages/l/libusal-1.1.11-37.fc27.x86_64.rpm](https://rpmfind.net/linux/fedora/linux/releases/27/Everything/x86_64/os/Packages/l/libusal-1.1.11-37.fc27.x86_64.rpm) -o libusal.rpm
+    curl https://rpmfind.net/linux/fedora/linux/releases/27/Everything/x86_64/os/Packages/l/libusal-1.1.11-37.fc27.x86_64.rpm
     rpm2cpio ./libusal.rpm | cpio -idmv
     cp usr/lib64/libusal.so.0 /usr/lib64/
     cp usr/lib64/librols.so.0* /usr/lib64
