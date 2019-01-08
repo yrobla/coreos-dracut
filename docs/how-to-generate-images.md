@@ -8,31 +8,31 @@ You need to be inside a vm running that image. So you need to create a vm with t
 
 The ignition file would look something like this:
 
-    {  
-       "ignition":{  
-          "config":{  
+    {
+       "ignition":{
+          "config":{
           },
-          "security":{  
-             "tls":{  
-                "certificateAuthorities":[  
-                   {  
+          "security":{
+             "tls":{
+                "certificateAuthorities":[
+                   {
                       "source":"<some source hash>",
-                      "verification":{  
+                      "verification":{
                       }
                    }
                 ]
              }
           },
-          "timeouts":{  
+          "timeouts":{
           },
           "version":"2.2.0"
        },
        ...
-       "passwd":{  
-          "users":[  
-             {  
+       "passwd":{
+          "users":[
+             {
                 "name":"core",
-                "sshAuthorizedKeys":[  
+                "sshAuthorizedKeys":[
                    "<public key>"
                 ]
              }
@@ -100,7 +100,7 @@ To generate the image, we need to have the vmlinuz of the ostree in the right /b
 Before executing mkisofs we need to download some specific dependencies. So execute the following commands:
 
     cd /tmp/
-    curl https://rpmfind.net/linux/fedora/linux/releases/27/Everything/x86_64/os/Packages/l/libusal-1.1.11-37.fc27.x86_64.rpm
+    curl https://rpmfind.net/linux/fedora/linux/releases/27/Everything/x86_64/os/Packages/l/libusal-1.1.11-37.fc27.x86_64.rpm -o libusal.rpm
     rpm2cpio ./libusal.rpm | cpio -idmv
     cp usr/lib64/libusal.so.0 /usr/lib64/
     cp usr/lib64/librols.so.0* /usr/lib64
