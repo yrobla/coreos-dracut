@@ -15,12 +15,27 @@ done
 ############################################################
 # Helper to write the ignition config
 ############################################################
-function write_ignition() if [[ -f /tmp/ignition.cfg ]]; then
-    mkdir -p /usr/lib/ignition/user.ign
+function write_ignition() {
+    echo "in write ignition"
+    if [[ -f /tmp/ignition.cfg ]]; then
+        echo "before root"
+        # check for the root partition
+        local ROOT_DEV=$(blkid -t "LABEL=root" -o device "${DEST_DEV}"*)
+        echo "before create"
+        mkdir -p /mnt/root_partition
+        echo "before mount"
+        mount "${ROOT_DEV}" /mnt/root_partition
+        echo "befor etrap"
+        trap 'umount /mnt/root_partition' RETURN
 
-    cp /tmp/ignition.cfg /usr/lib/ignition/user.ign
-    sleep 1
-fi
+        echo "before mkdir"
+        mkdir -p /mnt/root_partition/usr/lib/ignition
+        echo "before ign"
+        cp /tmp/ignition.cfg /munt/root_partition/usr/lib/ignition/user.ign
+        echo "before sleep"
+        sleep 1
+    fi
+}
 
 ############################################################
 #Get the image url to install
@@ -171,6 +186,8 @@ dd conv=nocreat count=1024 if=/dev/zero of="${DEST_DEV}" \
 #########################################################
 #And Write the image to disk
 #########################################################
+dialog --clear
+chvt2
 echo "Writing disk image" >> /tmp/debug
 # Note we add some to the image size so the dialog doesn't sit at 100% for a long time
 (dd if=/mnt/dl/imagefile.raw bs=1M oflag=direct of="${DEST_DEV}" status=none) 2>&1 |\
@@ -186,6 +203,7 @@ udevadm settle
 # If one was provided, install the ignition config
 #########################################################
 write_ignition
+exit 1
 
 if [ ! -f /tmp/skip_reboot ]
 then
