@@ -18,21 +18,13 @@ done
 function write_ignition() {
     echo "in write ignition"
     if [[ -f /tmp/ignition.cfg ]]; then
-        echo "before root"
         # check for the root partition
-        local ROOT_DEV=$(blkid -t "LABEL=root" -o device "${DEST_DEV}"*)
-        echo "before create"
         mkdir -p /mnt/root_partition
-        echo "before mount"
-        mount "${ROOT_DEV}" /mnt/root_partition
-        echo "befor etrap"
+        mount "${DEST_DEV}2" /mnt/root_partition
         trap 'umount /mnt/root_partition' RETURN
 
-        echo "before mkdir"
         mkdir -p /mnt/root_partition/usr/lib/ignition
-        echo "before ign"
-        cp /tmp/ignition.cfg /munt/root_partition/usr/lib/ignition/user.ign
-        echo "before sleep"
+        cp /tmp/ignition.cfg /mnt/root_partition/usr/lib/ignition/user.ign
         sleep 1
     fi
 }
@@ -94,7 +86,7 @@ do
 		break;
 	fi
 
-	curl -sI $IGNITION_URL >/tmp/ignition.cfg 2>&1
+	curl $IGNITION_URL -o /tmp/ignition.cfg
 	RETCODE=$?
 	if [ $RETCODE -ne 0 ]
 	then
@@ -155,25 +147,8 @@ mount -t tmpfs -o size=${TMPFS_MBSIZE}m tmpfs /mnt/dl
 #And Get the Image
 #########################################################
 echo "Downloading install image" >> /tmp/debug
-curl -s -o /mnt/dl/imagefile.raw $IMAGE_URL &
+curl -o /mnt/dl/imagefile.raw $IMAGE_URL
 
-while true
-do
-	pidof curl
-	if [ $? -ne 0 ]
-	then
-		break;
-	fi
-	if [ ! -f /mnt/dl/imagefile.raw ]
-	then
-		sleep 1
-		continue
-	fi
-	PART_FILE_SIZE=$(ls -l /mnt/dl/imagefile.raw | awk '{print $5}') 2>/dev/null
-	PCT=$(dc -e"2 k $PART_FILE_SIZE $IMAGE_SIZE / 100 * p" | sed -e"s/\..*$//" 2>/dev/null)
-	echo $PCT
-	sleep 1
-done | dialog --title 'CoreOS Installer' --guage "Downloading Image" 10 70
 
 
 #########################################################
@@ -203,7 +178,6 @@ udevadm settle
 # If one was provided, install the ignition config
 #########################################################
 write_ignition
-exit 1
 
 if [ ! -f /tmp/skip_reboot ]
 then
@@ -211,3 +185,4 @@ then
 	sleep 5
 	reboot --reboot --force
 fi
+
