@@ -12,6 +12,15 @@ do
     /sbin/ifup $iface
 done
 
+############################################################
+# Helper to write the ignition config
+############################################################
+function write_ignition() if [[ -f /tmp/ignition.cfg ]]; then
+    mkdir -p /usr/lib/ignition/user.ign
+
+    cp /tmp/ignition.cfg /usr/lib/ignition/user.ign
+    sleep 1
+fi
 
 ############################################################
 #Get the image url to install
