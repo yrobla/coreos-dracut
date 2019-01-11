@@ -16,17 +16,17 @@ done
 # Helper to write the ignition config
 ############################################################
 function write_ignition() {
-    echo "in write ignition"
-    if [[ -f /tmp/ignition.cfg ]]; then
-        # check for the root partition
-        mkdir -p /mnt/root_partition
-        mount "${DEST_DEV}2" /mnt/root_partition
-        trap 'umount /mnt/root_partition' RETURN
+    # check for the boot partition
+    mkdir -p /mnt/boot_partition
+    mount "${DEST_DEV}1" /mnt/boot_partition
+    trap 'umount /mnt/boot_partition' RETURN
 
-        mkdir -p /mnt/root_partition/usr/lib/ignition
-        cp /tmp/ignition.cfg /mnt/root_partition/usr/lib/ignition/user.ign
-        sleep 1
-    fi
+    # inject ignition kernel parameter
+    sed -i "#^linux16#s#$# coreos.config.url=$IGNITION_URL#" /mnt/boot_partition/grub2/grub.cfg
+    cat /mnt/boot_partition/grub2/grub.cfg
+    exit 1
+
+    sleep 1
 }
 
 ############################################################
@@ -69,33 +69,15 @@ dialog --clear
 ############################################################
 #Get the ignition url to install
 ############################################################
-while true
-do
-	echo "Getting ignition url" >> /tmp/debug
-	if [ ! -f /tmp/ignition_url ]
-	then
-		echo "Prompting for ignition url" >> /tmp/debug
-		dialog --title 'CoreOS Installer' --inputbox "Enter the CoreOS ignition config URL to install, or 'skip' for none" 5 75 "skip" 2>/tmp/ignition_url
-	fi
+echo "Getting ignition url" >> /tmp/debug
+if [ ! -f /tmp/ignition_url ]
+then
+	echo "Prompting for ignition url" >> /tmp/debug
+	dialog --title 'CoreOS Installer' --inputbox "Enter the CoreOS ignition config URL to install, or 'skip' for none" 5 75 "skip" 2>/tmp/ignition_url
+fi
 
-	IGNITION_URL=$(cat /tmp/ignition_url)
-	echo "IGNITION URL is $IGNITION_URL" >> /tmp/debug
-	echo $IGNITION_URL | grep -q "^skip$"
-	if [ $? -eq 0 ]
-	then
-		break;
-	fi
-
-	curl $IGNITION_URL -o /tmp/ignition.cfg
-	RETCODE=$?
-	if [ $RETCODE -ne 0 ]
-	then
-		dialog --title 'CoreOS Installer' --msgbox "Image Lookup Error $RETCODE for \n $IGNITION_URL" 10 70
-	else
-		break;
-	fi
-	rm -f /tmp/ignition_url
-done
+IGNITION_URL=$(cat /tmp/ignition_url)
+rm -f /tmp/ignition_url
 dialog --clear
 
 ###########################################################
@@ -177,7 +159,12 @@ udevadm settle
 #########################################################
 # If one was provided, install the ignition config
 #########################################################
-write_ignition
+dialog --clear
+echo "ignition is $IGNITION_URL"
+if [ "$IGNITION_URL" != "skip" ];then
+    echo "in write"
+    write_ignition
+fi
 
 if [ ! -f /tmp/skip_reboot ]
 then
