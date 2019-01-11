@@ -22,9 +22,7 @@ function write_ignition() {
     trap 'umount /mnt/boot_partition' RETURN
 
     # inject ignition kernel parameter
-    sed -i "#^linux16#s#$# coreos.config.url=$IGNITION_URL#" /mnt/boot_partition/grub2/grub.cfg
-    cat /mnt/boot_partition/grub2/grub.cfg
-    exit 1
+    sed -i "/^linux16/ s/$/ coreos.config.url=${IGNITION_URL//\//\\/}/" /mnt/boot_partition/grub2/grub.cfg
 
     sleep 1
 }
