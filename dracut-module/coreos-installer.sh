@@ -13,7 +13,13 @@ done
 ############################################################
 # Helper to write the ignition config
 ############################################################
+function collect_introspection_data() {
+}
+
 function write_ignition() {
+    # first collect all info from introspection
+    collect_introspection_data
+
     # check for the boot partition
     mkdir -p /mnt/boot_partition
     mount "${DEST_DEV}1" /mnt/boot_partition
