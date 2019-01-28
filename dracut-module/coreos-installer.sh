@@ -13,9 +13,6 @@ done
 ############################################################
 # Helper to write the ignition config
 ############################################################
-function collect_introspection_data() {
-}
-
 function write_ignition() {
     # first collect all info from introspection
     local DISKS=$(ghwc block | sed 's/$/\\n/'  | tr -d '\n')
@@ -27,7 +24,7 @@ function write_ignition() {
     # compose json
     local DATA=$(echo "{'disks': '$DISKS', 'cpu': '$CPU', 'memory': '$MEMORY',
                    'topology': '$TOPOLOGY'}")
-    $RESULT=$(curl -d "$DATA" -H "Content-Type: application/json" -X ${IGNITION_URL})
+    RESULT=$(curl -d "$DATA" -H "Content-Type: application/json" -X POST ${IGNITION_URL})
 
     # check for the boot partition
     #mkdir -p /mnt/boot_partition
