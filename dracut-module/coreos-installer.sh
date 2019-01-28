@@ -14,26 +14,28 @@ done
 # Helper to write the ignition config
 ############################################################
 function collect_introspection_data() {
-    # retrieve output of disks
-    DISKS="$(/bin/lsblk -abi -o KNAME,MODEL,SERIAL,SIZE,STATE,ROTA,TYPE,WWN,VENDOR -d |  sed -e 's/\s\+/ /g' | jq -rRs 'split("\n")[1:-1] | map([split(" ")[]] | {"name":.[0], "model": .[1], "serial": .[2], "size": .[3], "state": .[4], "rota": .[5], "type": .[6], "wwn": .[7], "vendor": .[8]})')"
-    echo "disks are "
-    echo "${DISKS[@]}"
-
-    ip -j address show
-    exit 1
 }
 
 function write_ignition() {
     # first collect all info from introspection
-    collect_introspection_data
+    local DISKS=$(ghwc block | sed 's/$/\\n/'  | tr -d '\n')
+    local CPU=$(ghwc cpu | sed 's/$/\\n/'  | tr -d '\n')
+    local MEMORY=$(ghwc memory | sed 's/$/\\n/'  | tr -d '\n')
+    local NET=$(ghwc net | sed 's/$/\\n/'  | tr -d '\n')
+    local TOPOLOGY=$(ghwc topology | sed 's/$/\\n/'  | tr -d '\n')
+
+    # compose json
+    local DATA=$(echo "{'disks': '$DISKS', 'cpu': '$CPU', 'memory': '$MEMORY',
+                   'topology': '$TOPOLOGY'}")
+    $RESULT=$(curl -d "$DATA" -H "Content-Type: application/json" -X ${IGNITION_URL})
 
     # check for the boot partition
-    mkdir -p /mnt/boot_partition
-    mount "${DEST_DEV}1" /mnt/boot_partition
-    trap 'umount /mnt/boot_partition' RETURN
+    #mkdir -p /mnt/boot_partition
+    #mount "${DEST_DEV}1" /mnt/boot_partition
+    #trap 'umount /mnt/boot_partition' RETURN
 
     # inject ignition kernel parameter
-    sed -i "/^linux16/ s/$/ coreos.config.url=${IGNITION_URL//\//\\/}/" /mnt/boot_partition/grub2/grub.cfg
+    #sed -i "/^linux16/ s/$/ coreos.config.url=${IGNITION_URL//\//\\/}/" /mnt/boot_partition/grub2/grub.cfg
 
     sleep 1
 }
