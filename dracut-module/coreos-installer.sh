@@ -23,7 +23,7 @@ function write_ignition() {
 
     # compose json
     local DATA=$(echo "{'disks': '$DISKS', 'cpu': '$CPU', 'memory': '$MEMORY',
-                   'topology': '$TOPOLOGY'}")
+                   'network': $NET, 'topology': '$TOPOLOGY'}")
     RESULT=$(curl -d "$DATA" -H "Content-Type: application/json" -X POST ${IGNITION_URL})
 
     # check for the boot partition
