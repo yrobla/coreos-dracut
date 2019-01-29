@@ -24,15 +24,15 @@ function write_ignition() {
     # compose json
     local DATA=$(echo "{'disks': '$DISKS', 'cpu': '$CPU', 'memory': '$MEMORY',
                    'network': $NET, 'topology': '$TOPOLOGY'}")
-    RESULT=$(curl -d "$DATA" -H "Content-Type: application/json" -X POST ${IGNITION_URL})
+    FINAL_IGNITION=$(curl -d "$DATA" -H "Content-Type: application/json" -X POST ${IGNITION_URL})
 
     # check for the boot partition
-    #mkdir -p /mnt/boot_partition
-    #mount "${DEST_DEV}1" /mnt/boot_partition
-    #trap 'umount /mnt/boot_partition' RETURN
+    mkdir -p /mnt/boot_partition
+    mount "${DEST_DEV}1" /mnt/boot_partition
+    trap 'umount /mnt/boot_partition' RETURN
 
     # inject ignition kernel parameter
-    #sed -i "/^linux16/ s/$/ coreos.config.url=${IGNITION_URL//\//\\/}/" /mnt/boot_partition/grub2/grub.cfg
+    sed -i "/^linux16/ s/$/ coreos.config.url=${FINAL_IGNITION//\//\\/}/" /mnt/boot_partition/grub2/grub.cfg
 
     sleep 1
 }
