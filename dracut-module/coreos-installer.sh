@@ -11,9 +11,9 @@ do
 done
 
 ############################################################
-# Helper to write the ignition config
+# Helper to query and write the ignition config
 ############################################################
-function write_ignition() {
+function get_ignition_file() {
     # first collect all info from introspection
     local DISKS=$(ghwc block | sed 's/$/\\n/'  | tr -d '\n')
     local CPU=$(ghwc cpu | sed 's/$/\\n/'  | tr -d '\n')
@@ -24,8 +24,11 @@ function write_ignition() {
     # compose json
     local DATA=$(echo "{'disks': '$DISKS', 'cpu': '$CPU', 'memory': '$MEMORY',
                    'network': $NET, 'topology': '$TOPOLOGY'}")
-    FINAL_IGNITION=$(curl -d "$DATA" -H "Content-Type: application/json" -X POST ${IGNITION_URL})
 
+    FINAL_IGNITION=$(curl --connect-timeout 5 --retry 10 --retry-delay 30 -d "$DATA" -H "Content-Type: application/json" -X POST ${IGNITION_URL})
+}
+
+function write_ignition_file() {
     # check for the boot partition
     mkdir -p /mnt/boot_partition
     mount "${DEST_DEV}1" /mnt/boot_partition
@@ -33,8 +36,6 @@ function write_ignition() {
 
     # inject ignition kernel parameter
     sed -i "/^linux16/ s/$/ coreos.config.url=${FINAL_IGNITION//\//\\/}/" /mnt/boot_partition/grub2/grub.cfg
-
-    sleep 1
 }
 
 ############################################################
@@ -75,6 +76,12 @@ rm -f /tmp/ignition_url
 
 DEST_DEV=$(cat /tmp/selected_dev)
 DEST_DEV=/dev/$DEST_DEV
+
+#########################################################
+# Query for the ignition endpoint
+#########################################################
+echo "Querying for ignition endpoint" >> /tmp/debug
+get_ignition_file
 
 #########################################################
 #Create the tmpfs filesystem to store the image
