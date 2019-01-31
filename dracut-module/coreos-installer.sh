@@ -14,15 +14,15 @@
 #
 #  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-udevadm trigger
-udevadm settle
+#udevadm trigger
+#udevadm settle
 
 # iterate over all interfaces and set them up
-readarray -t interfaces < <(ip l | awk -F ":" '/^[0-9]+:/{dev=$2 ; if ( dev !~ /^ lo$/) {print $2}}')
-for iface in "${interfaces[@]// /}"
-do
-    /sbin/ifup $iface
-done
+#readarray -t interfaces < <(ip l | awk -F ":" '/^[0-9]+:/{dev=$2 ; if ( dev !~ /^ lo$/) {print $2}}')
+#for iface in "${interfaces[@]// /}"
+#do
+#    /sbin/ifup $iface
+#done
 
 ############################################################
 # Helper to query and write the ignition config
