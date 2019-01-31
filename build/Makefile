@@ -18,7 +18,7 @@ clean-x86_64:
 	rm -f ./x86_64/coreos.iso
 
 x86_64:
-	dracut -c ./dracut.conf -f ./x86_64/isolinux/initrd.img ${KVER}
+	dracut -c ./dracut.conf --no-hostonly -f ./x86_64/isolinux/initrd.img ${KVER}
 	install -m755 ${ISOLINUX}/isolinux.bin ./x86_64/isolinux/isolinux.bin
 	install -m755 ${ISOLINUX}/ldlinux.c32 ./x86_64/isolinux/ldlinux.c32
 	install -m755 ${ISOLINUX}/libcom32.c32 ./x86_64/isolinux/libcom32.c32
