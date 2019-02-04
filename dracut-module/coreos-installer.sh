@@ -45,7 +45,8 @@ function get_ignition_file() {
 function write_ignition_file() {
     # check for the boot partition
     mkdir -p /mnt/boot_partition
-    mount "${DEST_DEV}1" /mnt/boot_partition
+    local BOOT_DEV=$(blkid -t "LABEL=boot" -o device "${DEST_DEV}"*)
+    mount "${BOOT_DEV}" /mnt/boot_partition
     trap 'umount /mnt/boot_partition' RETURN
 
     # inject ignition file
