@@ -48,8 +48,8 @@ function write_ignition_file() {
     mount "${DEST_DEV}1" /mnt/boot_partition
     trap 'umount /mnt/boot_partition' RETURN
 
-    # inject ignition kernel parameter
-    sed -i "/^linux16/ s/$/ coreos.config.url=${FINAL_IGNITION//\//\\/}/" /mnt/boot_partition/grub2/grub.cfg
+    # inject ignition file
+    echo $FINAL_IGNITION > /mnt/boot_partition/config.ign
 }
 
 ############################################################
