@@ -29,10 +29,11 @@ done
 ############################################################
 function get_ignition_file() {
     # first collect all info from introspection
-    local INTROSPECTION_OUTPUT=$(gwhc -f json)
+    local INTROSPECTION_OUTPUT=$(ghwc -f json)
 
     # then send the information to the introspection endpoint and collect ign
-    FINAL_IGNITION=$(curl --connect-timeout 5 --retry 10 --retry-delay 30 -d "$INTROSPECTION_OUTPUT" -H "Content-Type: application/json" -X POST ${IGNITION_URL})
+    FINAL_IGNITION=$(curl --connect-timeout 5 --retry 10 --retry-delay 30 -d
+    "$INTROSPECTION_OUTPUT" -H "Content-Type: application/json" -X POST ${INTROSPECTION_ENDPOINT})
     echo "${FINAL_IGNITION}" > /tmp/config.ign
 }
 
@@ -44,7 +45,7 @@ INTROSPECTION_ENDPOINT=$(cat /tmp/introspection_endpoint)
 rm -f /tmp/introspection_endpoint
 
 ##############################
-i# Query for the ignition file
+# Query for the ignition file
 ##############################
 echo "Querying for ignition endpoint" >> /tmp/debug
 get_ignition_file
