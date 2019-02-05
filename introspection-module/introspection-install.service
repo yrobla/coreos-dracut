@@ -1,0 +1,11 @@
+[Unit]
+Description=Introspection Installer
+Requires=coreos-install.service
+Before=coreos-install.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/introspection-installer.sh
+
+[Install]
+WantedBy=default.target

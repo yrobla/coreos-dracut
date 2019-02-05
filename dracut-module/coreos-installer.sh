@@ -24,24 +24,6 @@ do
     /sbin/ifup $iface
 done
 
-############################################################
-# Helper to query and write the ignition config
-############################################################
-function get_ignition_file() {
-    # first collect all info from introspection
-    local DISKS=$(ghwc block | sed 's/$/\\n/'  | tr -d '\n')
-    local CPU=$(ghwc cpu | sed 's/$/\\n/'  | tr -d '\n')
-    local MEMORY=$(ghwc memory | sed 's/$/\\n/'  | tr -d '\n')
-    local NET=$(ghwc net | sed 's/$/\\n/'  | tr -d '\n')
-    local TOPOLOGY=$(ghwc topology | sed 's/$/\\n/'  | tr -d '\n')
-
-    # compose json
-    local DATA=$(echo "{'disks': '$DISKS', 'cpu': '$CPU', 'memory': '$MEMORY',
-                   'network': $NET, 'topology': '$TOPOLOGY'}")
-
-    FINAL_IGNITION=$(curl --connect-timeout 5 --retry 10 --retry-delay 30 -d "$DATA" -H "Content-Type: application/json" -X POST ${IGNITION_URL})
-}
-
 function write_ignition_file() {
     # check for the boot partition
     mkdir -p /mnt/boot_partition
@@ -49,12 +31,13 @@ function write_ignition_file() {
     mount "${BOOT_DEV}" /mnt/boot_partition
     trap 'umount /mnt/boot_partition' RETURN
 
-    # inject ignition file
+    FINAL_IGNITION=$(cat /tmp/config.ign)
     echo $FINAL_IGNITION > /mnt/boot_partition/config.ign
+    rm /tmp/config.ign
 
-    # temporary: inject kernel parameter, as config.ign is not picked
-    CONFIG_URL="http://192.168.126.1/artifacts/stable_ignition/master.ign"
-    sed -i "/^linux16/ s/$/ coreos.config.url=${CONFIG_URL//\//\\/}/" /mnt/boot_partition/grub2/grub.cfg
+    if  [ "$IGNITION_URL" != "skip" ];then
+        sed -i "/^linux16/ s/$/ coreos.config.url=${IGNITION_URL//\//\\/}/" /mnt/boot_partition/grub2/grub.cfg
+    fi
 }
 
 ############################################################
@@ -97,14 +80,6 @@ DEST_DEV=$(cat /tmp/selected_dev)
 DEST_DEV=/dev/$DEST_DEV
 
 #########################################################
-# Query for the ignition endpoint
-#########################################################
-echo "Querying for ignition endpoint" >> /tmp/debug
-if [ "$IGNITION_URL" != "skip" ];then
-    get_ignition_file
-fi
-
-#########################################################
 #Create the tmpfs filesystem to store the image
 #########################################################
 echo "Mounting tmpfs" >> /tmp/debug
@@ -138,9 +113,7 @@ udevadm settle
 #########################################################
 # If one was provided, install the ignition config
 #########################################################
-if [ "$FINAL_IGNITION" != "" ];then
-    write_ignition_file
-fi
+write_ignition_file
 
 if [ ! -f /tmp/skip_reboot ]
 then

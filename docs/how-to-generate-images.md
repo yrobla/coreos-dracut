@@ -70,6 +70,8 @@ Once you are in the root filesystem as well, you need to move the needed files t
 
     mkdir /usr/lib/dracut/modules.d/90coreos
     cp -R /tmp/coreos-dracut/dracut-module/* /usr/lib/dracut/modules.d/90coreos/
+    mkdir /usr/lib/dracut/modules.d/90introspection
+    cp -R /tmp/coreos-dracut/introspection-module/* /usr/lib/dracut/modules.d/90introspection/
 
 Time to install dependencies again. So we will start the toolbox container, and continue installing packages:
 
