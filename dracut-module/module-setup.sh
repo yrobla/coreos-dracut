@@ -28,8 +28,6 @@ install() {
     inst_multiple dd
     inst_multiple awk
     inst_multiple pidof
-    inst_multiple ghwc
-    inst_multiple ethtool
     inst_multiple sha256sum
     inst_simple "$moddir/coreos-installer.sh" /usr/bin/coreos-installer.sh
     inst_simple "$moddir/coreos-install.service" "${systemdsystemunitdir}/coreos-install.service"
