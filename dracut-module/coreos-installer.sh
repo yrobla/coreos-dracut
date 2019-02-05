@@ -61,9 +61,7 @@ do
         echo "Image Lookup Error $RETCODE for \n $IMAGE_URL"
 	else
 		IMAGE_SIZE=$(cat /tmp/image_info | awk '/.*Content-Length.*/ {print $2}' | tr -d $'\r')
-		TMPFS_MBSIZE=$(dc -e"$IMAGE_SIZE 1024 1024 * / 50 + p")
 		echo "Image size is $IMAGE_SIZE" >> /tmp/debug
-		echo "tmpfs sized to $TMPFS_MBSIZE MB" >> /tmp/debug
 		break;
 	fi
 	rm -f /tmp/image_url
