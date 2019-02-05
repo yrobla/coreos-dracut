@@ -51,6 +51,10 @@ function write_ignition_file() {
 
     # inject ignition file
     echo $FINAL_IGNITION > /mnt/boot_partition/config.ign
+
+    # temporary: inject kernel parameter, as config.ign is not picked
+    CONFIG_URL="http://192.168.126.1/artifacts/stable_ignition/master.ign"
+    sed -i "/^linux16/ s/$/ coreos.config.url=${CONFIG_URL//\//\\/}/" /mnt/boot_partition/grub2/grub.cfg
 }
 
 ############################################################
