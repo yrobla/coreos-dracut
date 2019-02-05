@@ -32,8 +32,7 @@ function get_ignition_file() {
     local INTROSPECTION_OUTPUT=$(ghwc -f json)
 
     # then send the information to the introspection endpoint and collect ign
-    FINAL_IGNITION=$(curl --connect-timeout 5 --retry 10 --retry-delay 30 -d
-    "$INTROSPECTION_OUTPUT" -H "Content-Type: application/json" -X POST ${INTROSPECTION_ENDPOINT})
+    FINAL_IGNITION=$(curl --connect-timeout 5 --retry 10 --retry-delay 30 -d "$INTROSPECTION_OUTPUT" -H "Content-Type: application/json" -X POST ${INTROSPECTION_ENDPOINT})
     echo "${FINAL_IGNITION}" > /tmp/config.ign
 }
 
