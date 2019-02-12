@@ -26,17 +26,16 @@ done
 
 function write_ignition_file() {
     # check for the boot partition
-    mkdir -p /mnt/boot_partition
     local BOOT_DEV=$(blkid -t "LABEL=boot" -o device "${DEST_DEV}"*)
+    mkdir -p /mnt/boot_partition
     mount "${BOOT_DEV}" /mnt/boot_partition
     trap 'umount /mnt/boot_partition' RETURN
 
-    FINAL_IGNITION=$(cat /tmp/config.ign)
-    echo $FINAL_IGNITION > /mnt/boot_partition/config.ign
-    rm /tmp/config.ign
+    cp /tmp/ignition.cfg /mnt/boot_partition/config.ign
 
+    # workaround until we don't have config.ign on boot
     if  [ "$IGNITION_URL" != "skip" ];then
-        sed -i "/^linux16/ s/$/ coreos.config.url=${IGNITION_URL//\//\\/}/" /mnt/boot_partition/grub2/grub.cfg
+        sed -i "/^linux16/ s/$/ coreos.config.url=${IGNITION_URL_KERNEL_PARAM//\//\\/}/" /mnt/boot_partition/grub2/grub.cfg
     fi
 }
 
@@ -70,9 +69,32 @@ done
 ############################################################
 #Get the ignition url to install
 ############################################################
-echo "Getting ignition url" >> /tmp/debug
-IGNITION_URL=$(cat /tmp/ignition_url)
-rm -f /tmp/ignition_url
+while true
+do
+	echo "Getting ignition url" >> /tmp/debug
+	if [ ! -f /tmp/ignition_url ]
+	then
+		echo "Prompting for ignition url" >> /tmp/debug
+	fi
+
+	IGNITION_URL=$(cat /tmp/ignition_url)
+	echo "IGNITION URL is $IGNITION_URL" >> /tmp/debug
+	echo $IGNITION_URL | grep -q "^skip$"
+	if [ $? -eq 0 ]
+	then
+		break;
+	fi
+
+	curl -sI $IGNITION_URL >/tmp/ignition.cfg 2>&1
+	RETCODE=$?
+	if [ $RETCODE -ne 0 ]
+	then
+        echo "Image Lookup Error $RETCODE for \n $IGNITION_URL" 10 70
+	else
+		break;
+	fi
+	rm -f /tmp/ignition_url
+done
 
 DEST_DEV=$(cat /tmp/selected_dev)
 DEST_DEV=/dev/$DEST_DEV
