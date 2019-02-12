@@ -29,9 +29,25 @@ done
 ############################################################
 function get_ignition_file() {
     # first collect all info from introspection
-    local INTROSPECTION_OUTPUT=$(ghwc -f json)
+    local BLOCK_OUTPUT=$(ghwc block -f json)
+    local CPU_OUTPUT=$(ghwc cpu -f json)
+    local GPU_OUTPUT=$(ghwc gpu -f json)
+    local MEMORY_OUTPUT=$(ghwc memory -f json)
+    local NET_OUTPUT=$(ghwc net -f json)
+    local TOPOLOGY_OUTPUT=$(ghwc topology -f json)
+    local INTROSPECTION_OUTPUT=$(cat <<EOF
+    {
+      ${BLOCK_OUTPUT:1:-1},
+      ${CPU_OUTPUT:1:-1},
+      ${GPU_OUTPUT:1:-1},
+      ${MEMORY_OUTPUT:1:-1},
+      ${NET_OUTPUT:1:-1},
+      ${TOPOLOGY_OUTPUT:1:-1}
+    }
+EOF
+)
 
-    # then send the information to the introspection endpoint and collect ign
+    # then send the information to the   introspection endpoint and collect ign
     FINAL_IGNITION=$(curl --connect-timeout 5 --retry 10 --retry-delay 30 -d "$INTROSPECTION_OUTPUT" -H "Content-Type: application/json" -X POST ${INTROSPECTION_ENDPOINT})
     echo "${FINAL_IGNITION}" > /tmp/config.ign
 
