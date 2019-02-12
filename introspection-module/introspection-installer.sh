@@ -37,6 +37,11 @@ function get_ignition_file() {
 
     # override ignition url with file path
     echo "file:///tmp/config.ign" > /tmp/ignition_url
+
+    echo "final configuration is"
+    cat /tmp/config.ign
+    echo "ignition url is"
+    cat /tmp/ignition_url
 }
 
 ############################################################

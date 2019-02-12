@@ -78,7 +78,8 @@ do
 	fi
 
 	IGNITION_URL=$(cat /tmp/ignition_url)
-	echo "IGNITION URL is $IGNITION_URL" >> /tmp/debug
+	echo "IGNITION URL is $IGNITION_URL"
+    sleep 5
 	echo $IGNITION_URL | grep -q "^skip$"
 	if [ $? -eq 0 ]
 	then
@@ -93,6 +94,9 @@ do
 	else
 		break;
 	fi
+    echo "final configuration is"
+    cat /tmp/ignition.cfg
+    sleep 5
 	rm -f /tmp/ignition_url
 done
 
