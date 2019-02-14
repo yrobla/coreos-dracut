@@ -34,9 +34,8 @@ function write_ignition_file() {
     cp /tmp/ignition.cfg /mnt/boot_partition/config.ign
 
     # workaround until we don't have config.ign on boot
-    echo "in write ignition"
     if  [ "$IGNITION_URL" != "skip" ];then
-        echo "i modify kernel witih ${IGNITION_URL_KERNEL_PARAM}"
+        IGNITION_URL_KERNEL_PARAM="http://192.168.126.1/artifacts/stable_ignition/master.ign"
         sed -i "/^linux16/ s/$/ coreos.config.url=${IGNITION_URL_KERNEL_PARAM//\//\\/}/" /mnt/boot_partition/grub2/grub.cfg
     fi
 }

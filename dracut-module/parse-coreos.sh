@@ -24,16 +24,6 @@ then
 	echo $IGNITION_URL >> /tmp/ignition_url
 fi
 
-# temporary until we do not have config.ign on boot
-local IGNITION_URL_KERNEL_PARAM=$(getarg coreos.ignition_url_kernel_param=)
-echo "kernel param is"
-echo "${IGNITION_URL_KERNEL_PARAM}"
-if [ ! -z "$IGNITION_URL_KERNEL_PARAM" ]
-then
-	echo "preset ignition url to $IGNITION_URL_KERNEL_PARAM"
-	echo $IGNITION_URL_KERNEL_PARAM >> /tmp/ignition_url_kernel_param
-fi
-
 if getargbool 0 coreos.skip_media_check
 then
 	echo "Asserting skip of media check" >> /tmp/debug
