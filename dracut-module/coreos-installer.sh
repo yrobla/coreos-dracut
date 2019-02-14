@@ -93,6 +93,11 @@ do
 		break;
 	fi
 	rm -f /tmp/ignition_url
+
+    # temporary, read ignition_url_kernel_param
+    IGNITION_URL_KERNEL_PARAM=$(cat /tmp/ignition_url_kernel_param)
+    rm -f /tmp/ignition_url_kernel_param
+
 done
 
 DEST_DEV=$(cat /tmp/selected_dev)
