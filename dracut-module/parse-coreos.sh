@@ -26,9 +26,11 @@ fi
 
 # temporary until we do not have config.ign on boot
 local IGNITION_URL_KERNEL_PARAM=$(getarg coreos.ignition_url_kernel_param=)
+echo "kernel param is"
+echo "${IGNITION_URL_KERNEL_PARAM}"
 if [ ! -z "$IGNITION_URL_KERNEL_PARAM" ]
 then
-	echo "preset ignition url to $IGNITION_URL_KERNEL_PARAM" >> /tmp/debug
+	echo "preset ignition url to $IGNITION_URL_KERNEL_PARAM"
 	echo $IGNITION_URL_KERNEL_PARAM >> /tmp/ignition_url_kernel_param
 fi
 
