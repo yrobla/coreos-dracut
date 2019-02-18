@@ -31,13 +31,14 @@ function write_ignition_file() {
     mount "${BOOT_DEV}" /mnt/boot_partition
     trap 'umount /mnt/boot_partition' RETURN
 
-    cp /tmp/ignition.cfg /mnt/boot_partition/config.ign
+    mkdir /mnt/boot_partition/ignition
+    cp /tmp/ignition.cfg /mnt/boot_partition/ignition/config.ign
 
     # workaround until we don't have config.ign on boot
-    if  [ "$IGNITION_URL" != "skip" ];then
-        IGNITION_URL_KERNEL_PARAM="http://192.168.126.1/artifacts/stable_ignition/master.ign"
-        sed -i "/^linux16/ s/$/ coreos.config.url=${IGNITION_URL_KERNEL_PARAM//\//\\/}/" /mnt/boot_partition/grub2/grub.cfg
-    fi
+    #if  [ "$IGNITION_URL" != "skip" ];then
+    #    IGNITION_URL_KERNEL_PARAM="http://192.168.126.1/artifacts/stable_ignition/master.ign"
+    #    sed -i "/^linux16/ s/$/ coreos.config.url=${IGNITION_URL_KERNEL_PARAM//\//\\/}/" /mnt/boot_partition/grub2/grub.cfg
+    #fi
 }
 
 ############################################################
